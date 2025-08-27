@@ -1,1 +1,25 @@
-AZURE_CI_CD.yml
+jobs:
+  deploy-dev:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Deploy to Dev
+        uses: azure/arm-deploy@v1
+        with:
+          subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          resourceGroupName: my-rg-dev
+          template: ./arm-templates/azuredeploy.json
+          parameters: ./arm-templates/azuredeploy.parameters.dev.json
+
+  deploy-prod:
+    runs-on: ubuntu-latest
+    needs: deploy-dev
+    steps:
+      - uses: actions/checkout@v3
+      - name: Deploy to Prod
+        uses: azure/arm-deploy@v1
+        with:
+          subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          resourceGroupName: my-rg-prod
+          template: ./arm-templates/azuredeploy.json
+          parameters: ./arm-templates/azuredeploy.parameters.prod.json
